@@ -30,7 +30,10 @@ export interface ServerToClientEvents {
 		accepted: boolean,
 	) => void;
 	[SOCKET_EVENTS.RECEIVE_TURN]: (turn: number) => void;
-
+	[SOCKET_EVENTS.PROPERTY_UPGRADED]: (
+		propertyId: number,
+		userid: string,
+	) => void;
 	[SOCKET_EVENTS.CHAT_HISTORY]: (
 		messages: Array<{ message: string; username: string }>,
 	) => void;
@@ -99,6 +102,11 @@ export interface ClientToServerEvents {
 		tradeData: { offer: TradeData; request: TradeData },
 		status: "accepted" | "rejected",
 	) => void;
+	[SOCKET_EVENTS.UPGRADE_PROPERTY]: (
+		propertyId: number,
+		userId: string,
+		roomKey: string,
+	) => void;
 	[SOCKET_EVENTS.JOIN_RANDOM_ROOM]: (color: string) => void;
 	[SOCKET_EVENTS.LEAVE_ROOM]: (roomKey: string) => void;
 	[SOCKET_EVENTS.LEAVE_GAME]: (userId: string, roomKey: string) => void;
@@ -122,7 +130,11 @@ export type Player = {
 	votes: number;
 	money: number;
 	color: string;
-	properties: number[]; // array of owned property ids
+	properties: PropertySchema[];
+};
+export type PropertySchema = {
+	id: number;
+	rank: number;
 };
 export interface Room {
 	roomKey: string;

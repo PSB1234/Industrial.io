@@ -7,6 +7,7 @@ import { SOCKET_EVENTS } from "@/lib/socket_events";
 import type {
 	ClientToServerEvents,
 	Player,
+	PropertySchema,
 	ServerToClientEvents,
 	tradeDisplaySchema,
 } from "@/lib/type";
@@ -31,6 +32,8 @@ export interface GameStoreActions {
 	setUsername: (username: string) => void;
 	setPlayers: (players: Player[]) => void;
 	setColor: (color: string) => void;
+	getColorOfUser: (playerId: string) => string | undefined;
+	getColorByPropertyIndex: (propertyIndex: number) => string | undefined;
 	setVotedPlayers: (playerIds: string[]) => void;
 	addProperty: (playerId: string, propertyIndex: number) => void;
 	checkPropertyIsOwned: (propertyIndex: number) => boolean;
@@ -39,7 +42,8 @@ export interface GameStoreActions {
 		propertyIndex: number,
 	) => boolean;
 	getPropertyCount: (playerId: string) => number;
-	getProperty: (playerId: string) => number[];
+	getProperty: (playerId: string) => PropertySchema[];
+	getRankOfProperty: (propertyIndex: number) => number;
 	removeProperty: (playerId: string, propertyIndex: number) => void;
 	updatePlayer: (id: string, updates: Partial<Player>) => void;
 	sendVote: (
@@ -253,7 +257,10 @@ export const useGameStore = create<GameStore>()(
 					socket.off(SOCKET_EVENTS.RECEIVE_TURN, handleReceiveTurn);
 					socket.off(SOCKET_EVENTS.RECEIVE_VOTE, handleReceiveVote);
 					socket.off(SOCKET_EVENTS.YOUR_VOTES, handleYourVotes);
-					socket.off(SOCKET_EVENTS.RECEIVE_TRADE_OFFER, handleReceiveTradeOffer);
+					socket.off(
+						SOCKET_EVENTS.RECEIVE_TRADE_OFFER,
+						handleReceiveTradeOffer,
+					);
 					socket.off(
 						SOCKET_EVENTS.RECEIVE_CONFIRM_TRADE_OFFER,
 						handleReceiveConfirmTradeOffer,
@@ -267,6 +274,18 @@ export const useGameStore = create<GameStore>()(
 				return player ? player.username : undefined;
 			},
 			setColor: (color: string) => set({ color }),
+			getColorOfUser: (playerId: string) => {
+				const state = get();
+				const player = state.players.find((p) => p.id === playerId);
+				return player ? player.color : undefined;
+			},
+			getColorByPropertyIndex: (propertyIndex: number) => {
+				const state = get();
+				const player = state.players.find((p) =>
+					p.properties.some((property) => property.id === propertyIndex),
+				);
+				return player ? player.color : undefined;
+			},
 			setPlayers: (players: Player[]) => set({ players }),
 			setVotedPlayers: (votedPlayers: string[]) => set({ votedPlayers }),
 			updatePlayer: (id: string, updates: Partial<Player>) => {
@@ -282,13 +301,16 @@ export const useGameStore = create<GameStore>()(
 					const updatedPlayers = state.players.map((p) => {
 						// Ensure the property is removed from any previous owner (e.g., during trade)
 						const existingProperties = (p.properties ?? []).filter(
-							(prop) => prop !== propertyIndex,
+							(prop) => prop.id !== propertyIndex,
 						);
 
 						if (p.id === playerId) {
 							return {
 								...p,
-								properties: [...existingProperties, propertyIndex],
+								properties: [
+									...existingProperties,
+									{ id: propertyIndex, rank: 0 },
+								],
 							};
 						}
 						return {
@@ -309,17 +331,34 @@ export const useGameStore = create<GameStore>()(
 				const foundPlayer = state.players.find((p) => p.id === playerId);
 				return foundPlayer?.properties ?? [];
 			},
+			getRankOfProperty: (propertyIndex: number) => {
+				const state = get();
+				for (const player of state.players) {
+					const property = player.properties.find(
+						(prop) => prop.id === propertyIndex,
+					);
+					if (property) {
+						return property.rank;
+					}
+				}
+				return 0;
+			},
 			//check if any player owns the property
 			checkPropertyIsOwned: (propertyIndex: number) => {
 				const state = get();
-				return state.players.some((p) => p.properties.includes(propertyIndex));
+				return state.players.some((p) =>
+					p.properties.some((property) => property.id === propertyIndex),
+				);
 			},
 			//check if property is owned by player
 			checkPropertyOwnedByPlayer: (playerId: string, propertyIndex: number) => {
 				const state = get();
 				const foundPlayer = state.players.find((p) => p.id === playerId);
 				if (!foundPlayer) return false;
-				return foundPlayer.properties?.includes(propertyIndex) ?? false;
+				return (
+					foundPlayer.properties?.some((prop) => prop.id === propertyIndex) ??
+					false
+				);
 			},
 			displayTrade: () => {
 				const state = get();
@@ -330,7 +369,7 @@ export const useGameStore = create<GameStore>()(
 					const updatedPlayers = state.players.map((p) => {
 						if (p.id === playerId) {
 							const newProperties = (p.properties ?? []).filter(
-								(prop) => prop !== propertyIndex,
+								(prop) => prop.id !== propertyIndex,
 							);
 							return {
 								...p,

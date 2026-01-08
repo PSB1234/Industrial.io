@@ -1,17 +1,34 @@
-# Industial.io
+# Industrial.io
 
-This is a Industial.io project's frontend part. Currently the work is in progress. 
+> A retro-styled, real-time multiplayer implementation of the classic property trading board game.
 
-## What's Industial.io? 
+Industrial.io is a modern web-based board game inspired by Monopoly.
 
-It's a monopoly-like board game. 
+![Project Status](https://img.shields.io/badge/status-work_in_progress-pink)
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs.
-### Frontend:
-- [Next.js](https://nextjs.org)
-- [8bitcn](https://www.8bitcn.com/)
-- [Tailwind CSS](https://tailwindcss.com)
-### Backend:
-- [Socket.io](https://socket.io/)
-- [Express](https://expressjs.com/)
+## Features
+
+- **Real-time Multiplayer**: Play with friends seamlessly using WebSocket connections.
+- **Room System**: Create private rooms or join existing ones to trade properties and compete.
+- **Interactive Board**: Fully interactive game board with animations and player sprites.
+- **Trading System**: Robust trading mechanics allowing players to exchange properties and money.
+- **In-Game Chat**: communicate with other players in the lobby.
+- **Retro Aesthetic**: Custom 8-bit UI components and pixel art style.
+
+## Tech Stack
+
+### Frontend
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Directory)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **UI Components**: Built on [Radix UI](https://www.radix-ui.com/) primitives
+- **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
+- **Real-time**: [Socket.io Client](https://socket.io/)
+
+### Tooling
+- **Linter/Formatter**: [Biome](https://biomejs.dev/)
+- **Package Manager**: pnpm (recommended)
+
+
 

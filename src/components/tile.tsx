@@ -1,8 +1,9 @@
 import Image from "next/image";
 import type { TileDataSchema } from "@/lib/type";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/8bit/button";
+import { useGameStore } from "@/store/game_store";
 import { Card, CardContent } from "./ui/8bit/card";
+import { Button } from "./ui/button";
 export default function Tile({
 	className,
 	TileData,
@@ -10,6 +11,8 @@ export default function Tile({
 	className: string;
 	TileData: TileDataSchema;
 }) {
+	const { checkPropertyIsOwned, getColorByPropertyIndex, getRankOfProperty } =
+		useGameStore();
 	return (
 		<Card
 			className={cn(
@@ -26,20 +29,55 @@ export default function Tile({
 						)}
 					>
 						{TileData.price && (
-							<p className="wrap-break-word flex w-full flex-wrap px-2 text-start text-[9px] leading-tight">
+							<p
+								className={cn(
+									"flex w-full flex-wrap px-2 text-[9px]",
+									(TileData.id >= 1 && TileData.id <= 7) ||
+										(TileData.id >= 25 && TileData.id <= 31)
+										? "justify-start text-start"
+										: "justify-end text-end",
+								)}
+							>
 								${TileData.price}
 							</p>
 						)}
-						{TileData.rent && (
+						{TileData.rent && checkPropertyIsOwned(TileData.id) && (
 							<Button
-								className="relative h-2 w-2 p-2"
-								variant={"ghost"}
+								className="relative h-4 w-4 rounded-none border-4 border-white p-3"
+								style={{
+									backgroundColor: getColorByPropertyIndex(TileData.id),
+								}}
+								variant={"default"}
 							>
-								<Image
-									alt="Arrow Up"
-									className="pixelated"
-									fill
-									src="/icons/arrow-up-solid.svg"
+								<div
+									className="pixelated absolute inset-0 h-full w-full bg-white p-0.5"
+									style={{
+										maskOrigin: "content-box",
+										WebkitMaskOrigin: "content-box",
+										maskImage: `url(/upgrade-icons/house-${getRankOfProperty(TileData.id)}.svg)`,
+										maskSize: "contain",
+										maskPosition: "center",
+										maskRepeat: "no-repeat",
+										WebkitMaskImage: `url(/upgrade-icons/house-${getRankOfProperty(TileData.id)}.svg)`,
+										WebkitMaskSize: "contain",
+										WebkitMaskPosition: "center",
+										WebkitMaskRepeat: "no-repeat",
+									}}
+								/>{" "}
+								<div
+									className="pixelated absolute inset-0 h-full w-full bg-white p-0.5"
+									style={{
+										maskOrigin: "content-box",
+										WebkitMaskOrigin: "content-box",
+										maskImage: `url(/upgrade-icons/house-${getRankOfProperty(TileData.id)}.svg)`,
+										maskSize: "contain",
+										maskPosition: "center",
+										maskRepeat: "no-repeat",
+										WebkitMaskImage: `url(/upgrade-icons/house-${getRankOfProperty(TileData.id)}.svg)`,
+										WebkitMaskSize: "contain",
+										WebkitMaskPosition: "center",
+										WebkitMaskRepeat: "no-repeat",
+									}}
 								/>
 							</Button>
 						)}

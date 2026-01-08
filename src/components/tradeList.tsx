@@ -79,16 +79,16 @@ export default function TradeList({
 				{ourProperties.map((property) => (
 					<li
 						className="my-2 flex w-full flex-row justify-between"
-						key={property}
+						key={property.id}
 					>
 						<Checkbox
-							checked={data.properties.includes(property)}
+							checked={data.properties.includes(property.id)}
 							className="aspect-square max-h-fit max-w-fit"
 							onCheckedChange={(checked) =>
-								handlePropertyChange(property, checked === true)
+								handlePropertyChange(property.id, checked === true)
 							}
 						/>
-						<p>{property}</p>
+						<p>{property.id}</p>
 					</li>
 				))}
 			</ul>

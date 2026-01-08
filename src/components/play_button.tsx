@@ -13,8 +13,7 @@ export default function PlayButton({ game_id }: { game_id: string }) {
 	const [endTurnBtn, setEndTurnBtn] = useState<boolean>(false);
 	const [hasRolled, setHasRolled] = useState<boolean>(false);
 	const [endTurnFree, setEndTurnFree] = useState<boolean>(false);
-
-	const [position, setPosition] = useState<number>(0); //will be used to show the buy property option
+	const [position, setPosition] = useState<number>(0);
 	const { socket, emitEvent } = useSocketStore();
 	const {
 		updatePlayer,

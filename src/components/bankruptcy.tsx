@@ -1,0 +1,56 @@
+import { useRouter } from "next/navigation";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/8bit/alert-dialog";
+import { Button } from "@/components/ui/8bit/button";
+import { SOCKET_EVENTS } from "@/lib/socket_events";
+import { useGameStore } from "@/store/game_store";
+import useSocketStore from "@/store/socket_store";
+import { toast } from "./ui/8bit/toast";
+export default function Bankruptcy({ roomKey }: { roomKey: string }) {
+	const router = useRouter();
+	const { socket, emitEvent } = useSocketStore();
+	const { userId } = useGameStore();
+	const handleContinue = () => {
+		if (socket) {
+			emitEvent(SOCKET_EVENTS.LEAVE_GAME, userId, roomKey);
+			router.replace("/");
+		} else {
+			toast("Error", {
+				description: " Socket not connected",
+			});
+			return;
+		}
+	};
+	return (
+		<AlertDialog>
+			<AlertDialogTrigger>
+				<Button variant={"outline"}>Bankruptcy</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+					<AlertDialogDescription>
+						This action cannot be undone. This will mark you to be{" "}
+						<b>Bankrupted </b>
+						and removed from the game.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction onClick={handleContinue}>
+						Continue
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+	);
+}

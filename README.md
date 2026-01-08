@@ -1,32 +1,25 @@
-# Industrial.io
+# Industrial.io Backend
 
-> A retro-styled, real-time multiplayer implementation of the classic property trading board game.
-
-Industrial.io is a modern web-based board game inspired by Monopoly.
-
-![Project Status](https://img.shields.io/badge/status-work_in_progress-pink)
+This is the backend server for **Industrial.io**, a real-time multiplayer Monopoly-like board game. It handles game logic, room management, and player communication using WebSockets and HTTP APIs.
 
 ## Features
 
-- **Real-time Multiplayer**: Play with friends seamlessly using WebSocket connections.
-- **Room System**: Create private rooms or join existing ones to trade properties and compete.
-- **Interactive Board**: Fully interactive game board with animations and player sprites.
-- **Trading System**: Robust trading mechanics allowing players to exchange properties and money.
-- **In-Game Chat**: communicate with other players in the lobby.
-- **Retro Aesthetic**: Custom 8-bit UI components and pixel art style.
+- **Real-time Communication**: Powered by Socket.io for instant game updates and chat.
+- **Room Management**: Create, join, and manage game rooms.
+- **Game Logic**: Centralized game state management for the board game mechanics.
+- **Chat System**: In-game chat functionality for players.
+- **Type Safety**: Built with TypeScript and Zod for robust data validation.
 
 ## Tech Stack
 
-### Frontend
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Directory)
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express.js](https://expressjs.com/)
+- **Real-time**: [Socket.io](https://socket.io/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **UI Components**: Built on [Radix UI](https://www.radix-ui.com/) primitives
-- **Forms**: [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
-- **Real-time**: [Socket.io Client](https://socket.io/)
+- **Validation**: [Zod](https://zod.dev/)
+- **Tooling**: [Biome](https://biomejs.dev/) (Formatter/Linter), [tsx](https://github.com/privatenumber/tsx) (Dev server)
 
-### Tooling
-- **Linter/Formatter**: [Biome](https://biomejs.dev/)
-- **Package Manager**: pnpm (recommended)
+## Prerequisites
 
+- **Node.js** (v18 or higher recommended)
+- **pnpm** (Package manager)

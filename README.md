@@ -10,7 +10,6 @@ Industrial.io is a modern web-based board game inspired by Monopoly.
 
 - **Real-time Multiplayer**: Play with friends seamlessly using WebSocket connections.
 - **Room System**: Create private rooms or join existing ones to trade properties and compete.
-- **Interactive Board**: Fully interactive game board with animations and player sprites.
 - **Trading System**: Robust trading mechanics allowing players to exchange properties and money.
 - **In-Game Chat**: communicate with other players in the lobby.
 - **Retro Aesthetic**: Custom 8-bit UI components and pixel art style.
@@ -31,4 +30,11 @@ Industrial.io is a modern web-based board game inspired by Monopoly.
 - **Package Manager**: pnpm (recommended)
 
 
-
+##TODO:
+- [ ] **Animations**
+- [ ] **Working Option Page**
+- [ ] **Working Settings Page**
+- [ ] **Add Players Sprites**
+- [ ] **Add Tile Sprites**
+- [ ] **Sounds**
+  

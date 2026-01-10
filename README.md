@@ -30,7 +30,7 @@ Industrial.io is a modern web-based board game inspired by Monopoly.
 - **Package Manager**: pnpm (recommended)
 
 
-##TODO:
+## TODO
 - [ ] **Animations**
 - [ ] **Working Option Page**
 - [ ] **Working Settings Page**

@@ -47,7 +47,7 @@ const getTilePosition = (index: number) => {
 
 export default function Board({ game_id }: { game_id: string }) {
 	return (
-		<Card className="h-full max-h-screen">
+		<Card className="flex h-full max-h-screen w-full">
 			<CardContent
 				className="relative grid aspect-square h-full max-h-screen grid-cols-11 grid-rows-11 gap-4 gap-y-2"
 				style={{

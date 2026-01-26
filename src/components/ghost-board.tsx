@@ -41,6 +41,7 @@ const getTilePosition = (index: number) => {
 	];
 	return gridAreas[index] || "";
 };
+// TODO:MAKE BETTER QUALITY SPRITES FOR PLAYERS AND HANDLE HEIGHT PROPERLY AND ALSO MAKE IT COMPATIBLE FOR MULTIPLE PLAYERS TO STAY ON SAME TILE
 
 export default function GhostBoard({ PlayerList }: { PlayerList: Player[] }) {
 	return (

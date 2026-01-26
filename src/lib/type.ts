@@ -33,6 +33,7 @@ export interface ServerToClientEvents {
 	[SOCKET_EVENTS.PROPERTY_UPGRADED]: (
 		propertyId: number,
 		userid: string,
+		rank: number,
 	) => void;
 	[SOCKET_EVENTS.CHAT_HISTORY]: (
 		messages: Array<{ message: string; username: string }>,
@@ -106,6 +107,7 @@ export interface ClientToServerEvents {
 		propertyId: number,
 		userId: string,
 		roomKey: string,
+		upgradeCost: number,
 	) => void;
 	[SOCKET_EVENTS.JOIN_RANDOM_ROOM]: (color: string) => void;
 	[SOCKET_EVENTS.LEAVE_ROOM]: (roomKey: string) => void;
@@ -131,6 +133,7 @@ export type Player = {
 	money: number;
 	color: string;
 	properties: PropertySchema[];
+	leader: boolean;
 };
 export type PropertySchema = {
 	id: number;
@@ -144,22 +147,25 @@ export interface Room {
 }
 export type TileDataSchema = {
 	id: number;
+	name: string;
+	flagName: string;
 	type:
-		| "property"
-		| "Vacation"
-		| "go-to-jail"
-		| "jail"
-		| "freeParking"
-		| "start"
-		| "tax"
-		| "community-chest"
-		| "chance"
-		| "railroad";
+	| "property"
+	| "Vacation"
+	| "go-to-jail"
+	| "jail"
+	| "freeParking"
+	| "start"
+	| "tax"
+	| "community-chest"
+	| "chance"
+	| "railroad";
 	buyable?: boolean;
 	price?: number;
 	rent?: number[];
 	isCornerTile?: boolean;
 	reward?: number;
+	upgrade?: number[];
 };
 export type TileOwnership = {
 	tileId: number;

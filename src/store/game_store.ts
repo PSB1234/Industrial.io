@@ -45,7 +45,15 @@ export interface GameStoreActions {
 	getProperty: (playerId: string) => PropertySchema[];
 	getRankOfProperty: (propertyIndex: number) => number;
 	removeProperty: (playerId: string, propertyIndex: number) => void;
+	upgradeProperty: (
+		playerId: string,
+		socket: Socket<ServerToClientEvents, ClientToServerEvents> | null,
+		propertyIndex: number,
+		roomKey: string,
+		upgradeCost: number,
+	) => void;
 	updatePlayer: (id: string, updates: Partial<Player>) => void;
+	isThisPlayerLeader: () => boolean;
 	sendVote: (
 		roomKey: string,
 		playerId: string,
@@ -218,7 +226,25 @@ export const useGameStore = create<GameStore>()(
 						};
 					});
 				};
-
+				const handleUpgradeProperty = (
+					propertyId: number,
+					userid: string,
+					rank: number,
+				) => {
+					const state = get();
+					const player = state.players.find((p) => p.id === userid);
+					if (!player) return;
+					const property = player.properties.find(
+						(prop) => prop.id === propertyId,
+					);
+					if (!property) return;
+					const newRank = rank;
+					get().updatePlayer(userid, {
+						properties: player.properties.map((prop) =>
+							prop.id === propertyId ? { ...prop, rank: newRank } : prop,
+						),
+					});
+				};
 				// Remove any existing listeners to prevent duplicates
 				socket.off(SOCKET_EVENTS.GAME_LOOP);
 				socket.off(SOCKET_EVENTS.PLAYER_LEFT);
@@ -243,7 +269,7 @@ export const useGameStore = create<GameStore>()(
 					SOCKET_EVENTS.RECEIVE_CONFIRM_TRADE_OFFER,
 					handleReceiveConfirmTradeOffer,
 				);
-
+				socket.on(SOCKET_EVENTS.PROPERTY_UPGRADED, handleUpgradeProperty);
 				// Join on initial connection
 				joinRoom();
 				// Rejoin on reconnect
@@ -265,6 +291,7 @@ export const useGameStore = create<GameStore>()(
 						SOCKET_EVENTS.RECEIVE_CONFIRM_TRADE_OFFER,
 						handleReceiveConfirmTradeOffer,
 					);
+					socket.off(SOCKET_EVENTS.PROPERTY_UPGRADED, handleUpgradeProperty);
 				});
 			},
 			setUsername: (username: string) => set({ username }),
@@ -296,6 +323,17 @@ export const useGameStore = create<GameStore>()(
 				}));
 			},
 			getPlayerCount: () => get().players.length,
+			isThisPlayerLeader: () => {
+				const state = get();
+				const players = state.players;
+				if (players.length === 0) return false;
+
+				// Find the minimum rank among all players
+				const minRank = Math.min(...players.map((p) => p.rank));
+				const leader = players.find((player) => player.rank === minRank);
+
+				return leader?.id === state.userId;
+			},
 			addProperty: (playerId: string, propertyIndex: number) => {
 				set((state) => {
 					const updatedPlayers = state.players.map((p) => {
@@ -358,6 +396,22 @@ export const useGameStore = create<GameStore>()(
 				return (
 					foundPlayer.properties?.some((prop) => prop.id === propertyIndex) ??
 					false
+				);
+			},
+			upgradeProperty: (
+				playerId: string,
+				socket: Socket<ServerToClientEvents, ClientToServerEvents> | null,
+				propertyIndex: number,
+				roomKey: string,
+				upgradeCost: number,
+			) => {
+				if (!socket) return;
+				socket.emit(
+					SOCKET_EVENTS.UPGRADE_PROPERTY,
+					propertyIndex,
+					playerId,
+					roomKey,
+					upgradeCost,
 				);
 			},
 			displayTrade: () => {

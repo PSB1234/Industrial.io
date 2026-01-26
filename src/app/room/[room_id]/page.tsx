@@ -10,9 +10,10 @@ import useSocketStore from "@/store/socket_store";
 export default function Room() {
 	const router = useRouter();
 	const { room_id } = useParams<{ room_id: string }>();
-	const { players, initializeSocket } = useGameStore();
+	const { isThisPlayerLeader, players, initializeSocket } = useGameStore();
 	const [isLoading, setIsLoading] = useState(true);
 	const { socket, emitEvent } = useSocketStore();
+
 	useEffect(() => {
 		if (!socket || !room_id) return;
 		initializeSocket(room_id, socket);
@@ -50,7 +51,9 @@ export default function Room() {
 					</ul>
 				</CardContent>
 			</Card>
-			<Button onClick={onSubmit}>Submit</Button>
+			<Button disabled={!isThisPlayerLeader()} onClick={onSubmit}>
+				Submit
+			</Button>
 		</div>
 	);
 }

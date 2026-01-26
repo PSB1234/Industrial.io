@@ -36,7 +36,7 @@ export default function Game() {
 		return () => {};
 	}, [socket, game_id, initializeSocket, connectSocket, userId]);
 	return (
-		<div className="flex h-screen max-h-screen max-w-screen items-center justify-center gap-5 px-5">
+		<div className="flex h-screen max-h-screen max-w-screen items-center justify-center gap-6 px-5">
 			<div className="flex h-full max-h-screen w-full max-w-sm flex-col justify-between gap-5 py-5">
 				<div className="flex flex-row items-center justify-between">
 					<div className="relative">
@@ -53,7 +53,7 @@ export default function Game() {
 				<Trade roomKey={game_id} />
 				<Chat />
 			</div>
-			<div className="relative my-4 max-h-fit max-w-3xl">
+			<div className="relative my-4 max-h-fit">
 				<Board game_id={game_id} />
 				<div className="pointer-events-none absolute inset-0">
 					<GhostBoard PlayerList={players} />
@@ -65,7 +65,7 @@ export default function Game() {
 					<Kick roomKey={game_id} />
 					<Bankruptcy roomKey={game_id} />
 				</div>
-				<Properties />
+				<Properties roomKey={game_id} />
 				<TradeDisplay
 					displayTrade={displayTrade}
 					getUsernameById={getUsernameById}

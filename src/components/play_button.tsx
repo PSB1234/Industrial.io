@@ -5,7 +5,7 @@ import { SOCKET_EVENTS } from "@/lib/socket_events";
 import TileDataJson from "@/lib/tiledata";
 import { useGameStore } from "@/store/game_store";
 import useSocketStore from "@/store/socket_store";
-
+// TODO:FIX DICE BUG WHERE ROLLING IS SHOWN TO EVERYONE RATHER THAN JUST THE PLAYER WHO ROLLED IT
 export default function PlayButton({ game_id }: { game_id: string }) {
 	const [diceValue, setDiceValue] = useState<number>(1);
 	const [isRolling, setIsRolling] = useState<boolean>(false);
@@ -60,6 +60,7 @@ export default function PlayButton({ game_id }: { game_id: string }) {
 		if (!socket) return;
 		let interval: NodeJS.Timeout | null = null;
 		let timeout: NodeJS.Timeout | null = null;
+		let moveTimeout: NodeJS.Timeout | null = null;
 
 		const handleDiceRoll = (diceRoll: number) => {
 			setIsRolling(true);
@@ -76,40 +77,47 @@ export default function PlayButton({ game_id }: { game_id: string }) {
 			console.log("Received dice roll from server", diceRoll);
 		};
 		const playerMoveListener = (position: number, player_id: string) => {
-			updatePlayer(player_id, { position });
-			setPosition(position);
-			if (player_id === userId) {
-				// Only send money update if this is the current player who moved
-				const tile = TileDataJson[position];
-				if (!tile) {
-					console.error("Invalid tile position:", position);
-					return;
-				}
-				const propertyOwner = checkPropertyIsOwned(tile.id);
-				if (tile.buyable && propertyOwner === false) {
-					// Property is not owned, show buy option
-					setBuyProperty(true);
-					// End Turn remains disabled until buy button is clicked
-					return;
-				} else {
-					setBuyProperty(false);
-					setEndTurnFree(true);
-					// Property is owned
-					const isOwnedByMe = checkPropertyOwnedByPlayer(userId, tile.id);
-					if (isOwnedByMe) {
-						// Owned by me, do nothing
+			moveTimeout = setTimeout(() => {
+				updatePlayer(player_id, { position });
+				setPosition(position);
+				if (player_id === userId) {
+					// Only send money update if this is the current player who moved
+					const tile = TileDataJson[position];
+					if (!tile) {
+						console.error("Invalid tile position:", position);
 						return;
 					}
+					const propertyOwner = checkPropertyIsOwned(tile.id);
+					if (tile.buyable && propertyOwner === false) {
+						// Property is not owned, show buy option
+						setBuyProperty(true);
+						// End Turn remains disabled until buy button is clicked
+						return;
+					} else {
+						setBuyProperty(false);
+						setEndTurnFree(true);
+						// Property is owned
+						const isOwnedByMe = checkPropertyOwnedByPlayer(userId, tile.id);
+						if (isOwnedByMe) {
+							// Owned by me, do nothing
+							return;
+						}
 
-					if (propertyOwner) {
-						// Property is owned by another player, charge rent
-						const rent = tile.rent!;
-						emitEvent(SOCKET_EVENTS.SEND_MONEY, -1 * rent[0]!, userId, game_id);
+						if (propertyOwner) {
+							// Property is owned by another player, charge rent
+							const rent = tile.rent!;
+							emitEvent(
+								SOCKET_EVENTS.SEND_MONEY,
+								-1 * rent[0]!,
+								userId,
+								game_id,
+							);
+						}
 					}
+				} else {
+					setBuyProperty(false);
 				}
-			} else {
-				setBuyProperty(false);
-			}
+			}, 1000);
 		};
 
 		socket.on(SOCKET_EVENTS.GET_DICE_ROLL, handleDiceRoll);
@@ -121,6 +129,7 @@ export default function PlayButton({ game_id }: { game_id: string }) {
 		return () => {
 			if (interval) clearInterval(interval);
 			if (timeout) clearTimeout(timeout);
+			if (moveTimeout) clearTimeout(moveTimeout);
 			socket.off(SOCKET_EVENTS.GET_DICE_ROLL, handleDiceRoll);
 			socket.off(SOCKET_EVENTS.RECEIVE_POSITION, playerMoveListener);
 		};
@@ -166,6 +175,11 @@ export default function PlayButton({ game_id }: { game_id: string }) {
 					</Button>
 				)}
 			</div>
+			{!isMyTurn && (
+				<div className="text-center text-neutral-500 text-sm">
+					{players.find((p) => p.rank === turn)?.username}'s is playing
+				</div>
+			)}
 		</>
 	);
 }
